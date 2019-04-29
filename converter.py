@@ -4,6 +4,7 @@ import shutil
 import boto3
 import time, datetime
 import sendgrid
+import newrelic.agent
 from botocore.exceptions import ClientError
 from sendgrid.helpers.mail import *
 
@@ -19,6 +20,7 @@ sqs = boto3.client( 'sqs' )
 queue_url = os.environ.get( 'SQS_QUEUE_URL' )  # URL de SQS
 
 
+@newrelic.agent.background_task()
 def convertir_audio(fileImput):
     try:
 
@@ -117,6 +119,7 @@ def actualizar_grabacion(fileId, filePath):
         print( ex )
 
 
+@newrelic.agent.background_task()
 def SendEmailSendgrid(mail, url):
     print("usendmail--" + mail)
     sg = sendgrid.SendGridAPIClient(
@@ -172,6 +175,8 @@ def UpdateLogTable(startTime, endTime, totalFiles):
     except(ClientError) as error:
         print( error )
 
+
+@newrelic.agent.background_task()
 def leer_mensaje():
     while True:
         response = sqs.receive_message(
@@ -198,6 +203,7 @@ def leer_mensaje():
             time.sleep(60)
 
 
+@newrelic.agent.background_task()
 def eliminar_mensaje():
     sqs.delete_message(
         QueueUrl=queue_url,
