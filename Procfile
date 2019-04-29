@@ -1,1 +1,1 @@
-worker: python converter.py
+worker: newrelic-admin run-program python converter.py
