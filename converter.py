@@ -32,7 +32,7 @@ def convertir_audio(fileImput):
         s3_name = 'procesado/' + file_name_new
 
         s3 = boto3.resource( 's3' )
-        s3.Bucket( 'supervoices' ).download_file( fileImput['Archivo_Original'], file_original )
+        s3.Bucket( 'supervoices-app' ).download_file( fileImput['Archivo_Original'], file_original )
 
         upload_file_s3 = False
 
@@ -48,7 +48,7 @@ def convertir_audio(fileImput):
         # Subir archivo a S3
         if (upload_file_s3):
             s4 = boto3.client('s3')
-            s4.upload_file(output_file, 'supervoices', s3_name)
+            s4.upload_file(output_file, 'supervoices-app', s3_name)
             os.remove( output_file )
             procesar_archivo(fileImput['id'], s3_name, fileImput['Mail_Autor'], fileImput['Concurso_id'])
 
