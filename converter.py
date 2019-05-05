@@ -73,7 +73,6 @@ def procesar_archivo(fileId, outFile, mail, concurso_id):
         )
         concurso = respuesta_concurso['Item']
         url = concurso['Url_Concurso']
-        # SendEmailSendgrid(mail, url)
         SendEmailSendgrid( mail, url )
     except Exception as ex:
         print( ex )
