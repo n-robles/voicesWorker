@@ -132,8 +132,8 @@ def SendEmailSendgrid(mail, url):
         "text/plain", "La voz ya se encuentra disponible en la página principal del concurso " +
                       WS_IP + "/concursar/" + url
     )
-    mail = Mail(from_email, subject, to_email, content)
-    response = sg.client.mail.send.post(request_body=mail.get())
+    mailSend = Mail(from_email, to_email, subject, content)
+    response = sg.send(mailSend)
 
 
 def get_grabacion(id):
