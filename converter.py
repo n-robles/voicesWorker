@@ -129,7 +129,7 @@ def SendEmailSendgrid(mail, url):
     subject = "La voz ya esta disponible"
     WS_IP = os.environ.get('IP_HOST')
     content = Content(
-        "text/plain", "La voz ya se encuentra disponible en la página principal del concurso " +
+        "text/plain", "Heroku APP. La voz ya se encuentra disponible en la página principal del concurso " +
                       WS_IP + "/concursar/" + url
     )
     mailSend = Mail(from_email, to_email, subject, content)
@@ -178,7 +178,20 @@ def UpdateLogTable(startTime, endTime, totalFiles):
 
 @newrelic.agent.background_task(name='leer_mensaje', group='Task')
 def leer_mensaje():
+
+    # Validar directorios temporales
+
+    file_original = os.path.join( VOICES_ROOT, 'original')
+    if not os.path.exists(file_original):
+        os.makedirs( file_original )
+
+    file_procesado = os.path.join( VOICES_ROOT, 'procesado' )
+    if not os.path.exists(file_procesado):
+        os.makedirs( file_procesado )
+
+
     while True:
+
         response = sqs.receive_message(
             QueueUrl=queue_url,
             AttributeNames=[
