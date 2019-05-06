@@ -9,7 +9,7 @@ from botocore.exceptions import ClientError
 from sendgrid.helpers.mail import *
 
 MAX_WORKERS = 1
-PROJECT_ROOT = os.path.dirname( os.path.dirname( os.path.abspath( __file__ ) ) )
+PROJECT_ROOT = os.path.dirname( os.path.realpath( __file__ ) )
 VOICES_ROOT = os.path.join( PROJECT_ROOT, 'temp' )
 region = os.environ.get( 'AWS_DEFAULT_REGION' )
 
