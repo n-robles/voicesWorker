@@ -20,7 +20,7 @@ sqs = boto3.client( 'sqs' )
 queue_url = os.environ.get( 'SQS_QUEUE_URL' )  # URL de SQS
 
 
-@newrelic.agent.background_task()
+@newrelic.agent.background_task(name='convertir_audio', group='Task')
 def convertir_audio(fileImput):
     try:
 
@@ -118,7 +118,7 @@ def actualizar_grabacion(fileId, filePath):
         print( ex )
 
 
-@newrelic.agent.background_task()
+@newrelic.agent.background_task(name='SendEmailSendgrid', group='Task')
 def SendEmailSendgrid(mail, url):
     print("usendmail--" + mail)
     sg = sendgrid.SendGridAPIClient(
@@ -157,6 +157,7 @@ def get_grabacion(id):
         print(ex)
 
 
+@newrelic.agent.background_task(name='UpdateLogTable', group='Task')
 def UpdateLogTable(startTime, endTime, totalFiles):
     try:
         id = str( uuid.uuid4() )
@@ -175,7 +176,7 @@ def UpdateLogTable(startTime, endTime, totalFiles):
         print( error )
 
 
-@newrelic.agent.background_task()
+@newrelic.agent.background_task(name='leer_mensaje', group='Task')
 def leer_mensaje():
     while True:
         response = sqs.receive_message(
@@ -199,10 +200,10 @@ def leer_mensaje():
             atributos = message['MessageAttributes']
             get_grabacion(atributos['Grabacion_id']['StringValue'])
         else:
-            time.sleep(60)
+            time.sleep(15)
 
 
-@newrelic.agent.background_task()
+@newrelic.agent.background_task(name='eliminar_mensaje', group='Task')
 def eliminar_mensaje():
     sqs.delete_message(
         QueueUrl=queue_url,
