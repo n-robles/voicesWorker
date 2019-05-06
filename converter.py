@@ -119,22 +119,24 @@ def actualizar_grabacion(fileId, filePath):
 
 
 @newrelic.agent.background_task(name='SendEmailSendgrid', group='Task')
-def SendEmailSendgrid(mail, url):
-    print("usendmail--" + mail)
-    sg = sendgrid.SendGridAPIClient(
-        api_key=os.environ.get('SENDGRID_API_KEY')
-    )
-    from_email = Email("noreply@voices.com")
-    to_email = Email(mail)
-    subject = "La voz ya esta disponible"
-    WS_IP = os.environ.get('IP_HOST')
-    content = Content(
-        "text/plain", "Heroku APP. La voz ya se encuentra disponible en la página principal del concurso " +
-                      WS_IP + "/concursar/" + url
-    )
-    mail = Mail(from_email, subject, to_email, content)
-    response = sg.client.mail.send.post(request_body=mail.get())
+def SendEmailSendgrid(email, url):
+    try:
+        print("usendmail--" + email)
+        sg = sendgrid.SendGridAPIClient(
+            api_key=os.environ.get('SENDGRID_API_KEY')
+        )
+        from_email = "noreply@voices.com"
+        subject = "La voz ya esta disponible"
+        WS_IP = os.environ.get( 'IP_HOST' ) + '/concursar/' + url
+        content = '<html><head></head><body><p> Heroku APP . La voz ya se encuentra disponible en la página principal del ' + \
+                  'concurso, visite</p> <a href="' + WS_IP + '">Supervoices</a> ' + \
+                  '<p>para mas informacion</p></body></html>'
 
+        message = Mail(from_email=from_email, to_emails=email, subject=subject, html_content=content)
+        response = sg.send(message)
+        print( response.status_code )
+    except Exception as ex:
+        print( ex )
 
 def get_grabacion(id):
     try:
@@ -191,7 +193,6 @@ def leer_mensaje():
 
 
     while True:
-
         response = sqs.receive_message(
             QueueUrl=queue_url,
             AttributeNames=[
